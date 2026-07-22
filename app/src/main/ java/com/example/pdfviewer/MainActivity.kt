@@ -3,6 +3,7 @@ package com.example.pdfviewer
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.github.barteksc.pdfviewer.PDFView
@@ -11,7 +12,6 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var pdfView: PDFView
 
-    // For the manual "Select PDF" button
     private val pickPdfLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -27,33 +27,30 @@ class MainActivity : AppCompatActivity() {
         pdfView = findViewById(R.id.pdfView)
         val btnSelectPdf = findViewById<Button>(R.id.btnSelectPdf)
 
-        // Check if the app was opened by tapping a PDF in another app
         val intentUri: Uri? = intent.data
-        
         if (intentUri != null) {
-            // A file was passed to us, render it!
             displayPdf(intentUri)
-        } else {
-            // App was opened manually from the home screen, load a safe blank page
-            pdfView.fromBytes(ByteArray(0)).load()
         }
+        // The crashing ByteArray(0) dummy load has been permanently removed!
 
         btnSelectPdf.setOnClickListener {
             pickPdfLauncher.launch("application/pdf")
         }
     }
 
-    // A separate function to handle drawing the PDF with a safety net
     private fun displayPdf(uri: Uri) {
         try {
             pdfView.fromUri(uri)
                 .defaultPage(0)
                 .enableSwipe(true)
                 .swipeHorizontal(false)
+                .onError { 
+                    // Safely catches PDF rendering errors instead of crashing
+                    Toast.makeText(this, "Cannot read this PDF file", Toast.LENGTH_LONG).show()
+                }
                 .load()
         } catch (e: Exception) {
-            // If the PDF is corrupted, this catches the error so the app doesn't close
-            e.printStackTrace()
+            Toast.makeText(this, "Failed to open file", Toast.LENGTH_SHORT).show()
         }
     }
 }
