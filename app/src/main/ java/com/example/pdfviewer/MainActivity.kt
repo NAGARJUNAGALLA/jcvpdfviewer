@@ -11,15 +11,12 @@ class MainActivity : AppCompatActivity() {
     
     private lateinit var pdfView: PDFView
 
+    // For the manual "Select PDF" button
     private val pickPdfLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
-            pdfView.fromUri(uri)
-                .defaultPage(0)
-                .enableSwipe(true)
-                .swipeHorizontal(false)
-                .load()
+            displayPdf(uri)
         }
     }
 
@@ -30,11 +27,33 @@ class MainActivity : AppCompatActivity() {
         pdfView = findViewById(R.id.pdfView)
         val btnSelectPdf = findViewById<Button>(R.id.btnSelectPdf)
 
-        // FIX: Loads a 0-byte blank array so the app doesn't crash on startup
-        pdfView.fromBytes(ByteArray(0)).load()
+        // Check if the app was opened by tapping a PDF in another app
+        val intentUri: Uri? = intent.data
+        
+        if (intentUri != null) {
+            // A file was passed to us, render it!
+            displayPdf(intentUri)
+        } else {
+            // App was opened manually from the home screen, load a safe blank page
+            pdfView.fromBytes(ByteArray(0)).load()
+        }
 
         btnSelectPdf.setOnClickListener {
             pickPdfLauncher.launch("application/pdf")
+        }
+    }
+
+    // A separate function to handle drawing the PDF with a safety net
+    private fun displayPdf(uri: Uri) {
+        try {
+            pdfView.fromUri(uri)
+                .defaultPage(0)
+                .enableSwipe(true)
+                .swipeHorizontal(false)
+                .load()
+        } catch (e: Exception) {
+            // If the PDF is corrupted, this catches the error so the app doesn't close
+            e.printStackTrace()
         }
     }
 }
