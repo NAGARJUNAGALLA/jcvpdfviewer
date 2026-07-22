@@ -2,10 +2,23 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application android:label="PDF Viewer" android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".MainActivity" android:exported="true">
+            
+            <!-- This makes the app show up on your home screen -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- THIS makes the app show up in the "Open with..." menu for PDFs -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+
         </activity>
     </application>
 </manifest>
