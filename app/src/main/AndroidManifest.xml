@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:label="PDF Viewer" android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+    <!-- Gives the app permission to accept files from your File Manager -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- Added requestLegacyExternalStorage to prevent security crashes on Android 10/11 -->
+    <application 
+        android:label="PDF Viewer" 
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:requestLegacyExternalStorage="true">
+        
         <activity android:name=".MainActivity" android:exported="true">
             
-            <!-- This makes the app show up on your home screen -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- THIS makes the app show up in the "Open with..." menu for PDFs -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
